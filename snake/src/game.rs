@@ -2,14 +2,14 @@ use piston_window::*;
 use piston_window::types::Color;
 use rand::{Rng, thread_rng};
 
-use crate::drawing::{draw_block, draw_rectange};
+use crate::drawing::{draw_block, draw_rectangle};
 use crate::snake::{Direction, Snake};
 
 const FOOD_COLOR: Color = [0.90, 0.49, 0.13, 1.0];
 const BORDER_COLOR: Color = [0.741, 0.765, 0.78, 1.0];
 const GAMEOVER_COLOR: Color = [0.91, 0.30, 0.24, 0.5];
 
-const MOVING_PERIOD: f64 = 0.2;
+const MOVING_PERIOD: f64 = 0.07;
 // in second
 const RESTART_TIME: f64 = 1.0; // in second
 
@@ -76,14 +76,14 @@ impl Game {
         }
 
         // Draw the border
-        draw_rectange(BORDER_COLOR, 0, 0, self.width, 1, con, g);
-        draw_rectange(BORDER_COLOR, 0, self.height - 1, self.width, 1, con, g);
-        draw_rectange(BORDER_COLOR, 0, 0, 1, self.height, con, g);
-        draw_rectange(BORDER_COLOR, self.width - 1, 0, 1, self.height, con, g);
+        draw_rectangle(BORDER_COLOR, 0, 0, self.width, 1, con, g);
+        draw_rectangle(BORDER_COLOR, 0, self.height - 1, self.width, 1, con, g);
+        draw_rectangle(BORDER_COLOR, 0, 0, 1, self.height, con, g);
+        draw_rectangle(BORDER_COLOR, self.width - 1, 0, 1, self.height, con, g);
 
         // Draw a game-over rectangle
         if self.is_game_over {
-            draw_rectange(GAMEOVER_COLOR, 0, 0, self.width, self.height, con, g);
+            draw_rectangle(GAMEOVER_COLOR, 0, 0, self.width, self.height, con, g);
         }
     }
 
