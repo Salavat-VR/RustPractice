@@ -19,4 +19,12 @@ practicing writing module and integration tests, understanding the distinguishes
 GREP - (Globally search a Regular  Expression and Print)
 "глобальное средство поиска и печати"
 
+Usage: searches a query from given file and returns the lines, which contains that query
+
+
+```
+cargo run <query> <filename>
+```
+
+
 
