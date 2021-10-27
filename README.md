@@ -32,5 +32,10 @@ function that count the letters and digits in string
  plus 
 practice in writing & organizing tests
 
+# to_do_journal
+
+Command line program that implements the journal features
+
+![image](https://user-images.githubusercontent.com/58668238/139132732-051b7425-e6a8-4788-9ac7-60583e533d16.png)
 
 
