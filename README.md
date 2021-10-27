@@ -28,5 +28,9 @@ cargo run <query> <filename>
 
 # letter_n_nums
 
+function that count the letters and digits in string
+ plus 
+practice in writing & organizing tests
+
 
 
