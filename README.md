@@ -55,6 +55,4 @@ cargo run -- -j test-journal.json list
 ```
 
 
-
-![image](https://user-images.githubusercontent.com/58668238/139323852-d43b17ab-24c1-4fb0-ab12-4cb022f451c5.png)
-
+![image](https://user-images.githubusercontent.com/58668238/139326064-cba946b7-b256-4c0e-95a0-aeeee648a7cb.png)
