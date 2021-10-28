@@ -1,3 +1,8 @@
+use structopt::StructOpt;
+
+mod cli;
+mod tasks;
+
 fn main() {
-    println!("Hello, world!");
+    cli::CommandLineArgs::from_args();
 }
