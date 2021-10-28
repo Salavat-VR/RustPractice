@@ -38,4 +38,23 @@ Command line program that implements the journal features
 
 ![image](https://user-images.githubusercontent.com/58668238/139132732-051b7425-e6a8-4788-9ac7-60583e533d16.png)
 
+How to add command to the journal file:
+
+```
+cargo run -- -j test-journal.json add "SOME IMPORTANT TASK"
+```
+
+how to complete task:
+```
+cargo run -- -j test-journal.json done NUMBER_OF_TASK
+```
+
+how to see all the tasks:
+```
+cargo run -- -j test-journal.json list
+```
+
+
+
+![image](https://user-images.githubusercontent.com/58668238/139323852-d43b17ab-24c1-4fb0-ab12-4cb022f451c5.png)
 

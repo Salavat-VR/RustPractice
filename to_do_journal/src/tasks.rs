@@ -1,3 +1,4 @@
+use std::fmt;
 use std::fs::{File, OpenOptions};
 use std::io::{BufReader, Error, ErrorKind, Result, Seek, SeekFrom};
 use std::path::PathBuf;
@@ -66,4 +67,33 @@ fn collect_tasks(mut file: &File) -> Result<Vec<Task>> {
     };
     file.seek(SeekFrom::Start(0))?; // Rewind the file after.
     Ok(tasks)
+}
+
+
+pub fn list_tasks(journal_path: PathBuf) -> Result<()> {
+    // Open the file.
+    let file = OpenOptions::new().read(true).open(journal_path)?;
+    // Parse the file and collect the tasks.
+    let tasks = collect_tasks(&file)?;
+
+    // Enumerate and display tasks, if any.
+    if tasks.is_empty() {
+        println!("Task list is empty!");
+    } else {
+        let mut order: u32 = 1;
+        for task in tasks {
+            println!("{}: {}", order, task);
+            order += 1;
+        }
+    }
+
+    Ok(())
+}
+
+impl fmt::Display for Task {
+    // how do we want our Task to be printed
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let created_at = self.created_at.with_timezone(&Local).format("%F %H:%M");
+        write!(f, "{:<50} [{}]", self.text, created_at)
+    }
 }
