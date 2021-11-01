@@ -29,10 +29,12 @@ impl Block {
 
     pub fn set_nonce(&mut self, nonce: u128) {
         self.nonce = nonce;
+        self.update_hash();
     }
 
     pub fn add_transaction(&mut self, transaction: Transaction) {
         self.transactions.push(transaction);
+        self.update_hash();
     }
 
     fn update_hash(&mut self) {
