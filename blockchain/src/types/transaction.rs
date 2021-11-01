@@ -1,3 +1,7 @@
+use blake2::{Blake2s, Digest};
+use blake2::digest::FixedOutput;
+
+use crate::trairs::Hashable;
 use crate::types::{AccountId, Balance, Hash, Timestamp};
 
 #[derive(Debug)]
@@ -9,7 +13,7 @@ pub struct Transaction {
     timestamp: Timestamp,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TransactionData {
     CreateAccount(AccountId),
     MintInitialSupply { to: AccountId, amount: Balance },
@@ -28,3 +32,21 @@ impl Transaction {
     }
 }
 
+
+impl Hashable for Transaction {
+    fn hash(&self) -> Hash {
+        let mut hasher = Blake2s::new();
+
+        hasher.update(format!(
+            "{:?}",
+            (
+                self.nonce,
+                self.timestamp,
+                self.from.clone(),
+                self.data.clone()
+            )
+        ));
+
+        hex::encode(hasher.finalize_fixed())
+    }
+}

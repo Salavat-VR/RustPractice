@@ -1,26 +1,30 @@
 use blake2::{Blake2s, Digest};
 use blake2::digest::FixedOutput;
 
+use crate::trairs::Hashable;
 use crate::types::{Hash, Transaction};
 
 // реализуем дефолтные значения для нашей структуры
 #[derive(Default, Debug)]
 pub struct Block {
     nonce: u128,
-    hash: Hash,
+    hash: Option<Hash>,
     prev_hash: Option<Hash>,
     transactions: Vec<Transaction>,
 }
 
-
 impl Block {
     pub fn new(prev_hash: Option<Hash>) -> Block {
-        Block {
+        let mut block = Block {
             prev_hash,
             // используем эти дефолтные значение для кокретных типов,
             // определенных нами
             ..Default::default()
-        }
+        };
+
+        block.update_hash();
+
+        block
     }
 
     pub fn set_nonce(&mut self, nonce: u128) {
@@ -31,14 +35,24 @@ impl Block {
         self.transactions.push(transaction);
     }
 
-    pub fn hash(&self) -> Hash {
-        let mut hasher = Blake2s::new();
+    fn update_hash(&mut self) {
+        self.hash = Some(self.hash())
+    }
+}
 
+impl Hashable for Block {
+    fn hash(&self) -> Hash {
+        let mut hasher = Blake2s::new();
         hasher.update(format!("{:?}", (self.prev_hash.clone(), self.nonce)).as_bytes());
+
+        for tx in self.transactions.iter() {
+            hasher.update(tx.hash())
+        }
 
         hex::encode(hasher.finalize_fixed())
     }
 }
+
 
 #[cfg(test)]
 mod tests {
@@ -52,14 +66,12 @@ mod tests {
         let mut block = Block::new(None);
         block.set_nonce(2);
 
-        let mut tx = Transaction::new(TransactionData::CreateAccount("Dmytro    ".to_string()), None);
-
+        let mut tx = Transaction::new(TransactionData::CreateAccount("Dmytro".to_string()), None);
 
         block.add_transaction(tx);
 
         dbg!(block);
     }
-
 
     #[test]
     fn test_hash() {
@@ -68,7 +80,9 @@ mod tests {
 
         let hash1 = block.hash();
 
+        block.set_nonce(3);
+        let hash2 = block.hash();
 
-        assert_eq!(hash1, String::from("96cc9f93fc5855cf0d4a31c095d7f77969e54f690dcad51c789f8a5499cba5da"))
+        assert_ne!(hash1, hash2)
     }
 }
