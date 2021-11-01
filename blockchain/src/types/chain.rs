@@ -1,13 +1,33 @@
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct Node<T> {
     data: T,
     prev: Option<Box<Node<T>>>,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct Chain<T> {
     head: Option<Box<Node<T>>>,
     len: usize,
+}
+
+pub struct ChainIter<'a, T> {
+    // ссылка на ноду будет существовать ровно столько,
+    // сколько и наш итератор
+    next: Option<&'a Node<T>>,
+
+}
+
+impl<'a, T> Iterator for ChainIter<'a, T> {
+    // возвращаем ссылочки на блок и (lifetime specifier)
+    type Item = &'a T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.next.take().map(|node| {
+            self.next = node.prev.as_deref();
+            &node.data
+        });
+        None
+    }
 }
 
 
@@ -46,6 +66,12 @@ impl<T: Default> Chain<T> {
             Some(head) => Some(&head.data),
         }
     }
+
+    pub fn iter(&self) -> ChainIter<T> {
+        ChainIter {
+            next: self.head.as_deref(),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -53,7 +79,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn chain_basic_test() {
+    fn chain_iter_test() {
         let mut chain = Chain::<u32>::new();
 
         chain.append(1);
@@ -61,6 +87,15 @@ mod tests {
         chain.append(3);
         chain.append(4);
 
-        assert_eq!(chain.head(), Some(&4))
+        // from previous test to be sure everything's right
+        // assert_eq!(chain.head(), Some(&4));
+
+        for node in chain.iter() {
+            dbg!(node);
+        }
+
+
+
     }
+
 }
