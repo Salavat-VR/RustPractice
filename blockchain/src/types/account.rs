@@ -11,3 +11,13 @@ pub enum AccountType {
     User,
     Contract,
 }
+
+impl Account {
+    pub fn new(account_type: AccountType) -> Account {
+        Account {
+            account_type,
+            balance: 0,
+        }
+    }
+}
+
