@@ -1,4 +1,4 @@
 use std::collections::HashMap;
 
-mod trairs;
+mod traits;
 mod types;

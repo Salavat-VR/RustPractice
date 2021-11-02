@@ -1,14 +1,14 @@
 use blake2::{Blake2s, Digest};
 use blake2::digest::FixedOutput;
 
-use crate::trairs::Hashable;
+use crate::traits::Hashable;
 use crate::types::{Hash, Transaction};
 
 // реализуем дефолтные значения для нашей структуры
 #[derive(Default, Debug)]
 pub struct Block {
     nonce: u128,
-    hash: Option<Hash>,
+    pub(crate) hash: Option<Hash>,
     prev_hash: Option<Hash>,
     transactions: Vec<Transaction>,
 }

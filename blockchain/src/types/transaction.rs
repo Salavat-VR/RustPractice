@@ -1,7 +1,7 @@
 use blake2::{Blake2s, Digest};
 use blake2::digest::FixedOutput;
 
-use crate::trairs::Hashable;
+use crate::traits::Hashable;
 use crate::types::{AccountId, Balance, Hash, Timestamp};
 
 #[derive(Debug)]
