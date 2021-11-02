@@ -1,7 +1,9 @@
+use std::fmt::Error;
+
 use blake2::{Blake2s, Digest};
 use blake2::digest::FixedOutput;
 
-use crate::traits::Hashable;
+use crate::traits::{Hashable, WorldState};
 use crate::types::{AccountId, Balance, Hash, Timestamp};
 
 #[derive(Debug)]
@@ -29,6 +31,10 @@ impl Transaction {
             signature: None,
             timestamp: 0,
         }
+    }
+
+    pub fn execute<T: WorldState>(&self, state: &mut T, is_genesis: bool) -> Result<(), Error> {
+        Ok(())
     }
 }
 

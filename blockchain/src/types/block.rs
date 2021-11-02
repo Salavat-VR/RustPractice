@@ -10,7 +10,7 @@ pub struct Block {
     nonce: u128,
     pub(crate) hash: Option<Hash>,
     prev_hash: Option<Hash>,
-    transactions: Vec<Transaction>,
+    pub(crate) transactions: Vec<Transaction>,
 }
 
 impl Block {
@@ -42,10 +42,8 @@ impl Block {
     }
 
     pub fn verify(&self) -> bool {
-        matches!(&self.hash, Some(hash) if hash == self.hash())
+        matches!(&self.hash, Some(hash) if hash == &self.hash())
     }
-
-
 }
 
 impl Hashable for Block {

@@ -1,12 +1,12 @@
 use crate::types::Balance;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Account {
     account_type: AccountType,
     balance: Balance,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum AccountType {
     User,
     Contract,
