@@ -22,7 +22,6 @@ impl Blockchain {
         self.blocks.len()
     }
 
-
     pub fn append_block(&mut self, block: Block) -> Result<(), Error> {
         if !block.verify() {
             return Err("block has invalid hash".to_string());
@@ -36,11 +35,10 @@ impl Blockchain {
 
         let accounts_backup = self.accounts.clone();
 
-
         for tx in &block.transactions {
             let result = tx.execute(self, is_genesis);
             if let Err(error) = result {
-                // бэкап транзакций в случае если случилась какая то ошибка
+                // бэкап транзакций в  случае если случилась какая то ошибка
                 self.accounts = accounts_backup;
 
                 return Err(format!("tx didn't execute, something went wrong"));
@@ -52,15 +50,17 @@ impl Blockchain {
         Ok(())
     }
 
-
     pub fn get_last_block_hash(&self) -> Option<Hash> {
-        self.blocks.head().map(|block| { block.hash() })
+        self.blocks.head().map(|block| block.hash())
     }
 }
 
-
 impl WorldState for Blockchain {
-    fn create_account(&mut self, account_id: AccountId, account_type: AccountType) -> Result<(), Error> {
+    fn create_account(
+        &mut self,
+        account_id: AccountId,
+        account_type: AccountType,
+    ) -> Result<(), Error> {
         match self.accounts.entry(account_id) {
             Entry::Occupied(_) => Err(format!("account with this account id already exists")),
             Entry::Vacant(v) => {
@@ -79,9 +79,10 @@ impl WorldState for Blockchain {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
+    use crate::types::TransactionData;
+
     use super::*;
 
     #[test]
@@ -96,7 +97,27 @@ mod tests {
         bc.append_block(genesis_block);
         bc.append_block(first_block);
 
-
         dbg!(bc);
+    }
+
+    #[test]
+    fn satoshi_test() {
+        let mut bc = Blockchain::new();
+
+        let mut tx_cr_account =
+            Transaction::new(TransactionData::CreateAccount("amI".to_string()), None);
+
+        let mut tx_mint_initial_supply = Transaction::new(
+            TransactionData::MintInitialSupply {
+                to: "amI".to_string(),
+                amount: 100,
+            },
+            None,
+        );
+
+        let mut block = Block::new(None);
+        block.set_nonce(2);
+
+
     }
 }

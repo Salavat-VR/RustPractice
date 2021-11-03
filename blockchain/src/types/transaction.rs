@@ -1,10 +1,8 @@
-use std::fmt::Error;
-
-use blake2::{Blake2s, Digest};
 use blake2::digest::FixedOutput;
+use blake2::{Blake2s, Digest};
 
 use crate::traits::{Hashable, WorldState};
-use crate::types::{AccountId, Balance, Hash, Timestamp};
+use crate::types::{AccountId, AccountType, Balance, Error, Hash, Timestamp};
 
 #[derive(Debug)]
 pub struct Transaction {
@@ -34,10 +32,30 @@ impl Transaction {
     }
 
     pub fn execute<T: WorldState>(&self, state: &mut T, is_genesis: bool) -> Result<(), Error> {
-        Ok(())
+        match &self.data {
+            TransactionData::CreateAccount(account_id) => {
+                state.create_account(account_id.clone(), AccountType::User)
+            }
+
+            TransactionData::MintInitialSupply { to, amount } => {
+                if !is_genesis {
+                    return Err(
+                        "initial supply is allowed to execute only to genesis block".to_string()
+                    );
+                }
+                match state.get_account_by_id_mut(to.clone()) {
+                    Some(account) => {
+                        account.balance += amount;
+                        Ok(())
+                    }
+                    None => Err("there is no such account. check account id".to_string()),
+                }
+            }
+
+            _ => Err("unknown tx".to_string()),
+        }
     }
 }
-
 
 impl Hashable for Transaction {
     fn hash(&self) -> Hash {

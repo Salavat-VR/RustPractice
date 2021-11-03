@@ -14,7 +14,6 @@ pub struct ChainIter<'a, T> {
     // ссылка на ноду будет существовать ровно столько,
     // сколько и наш итератор
     next: Option<&'a Node<T>>,
-
 }
 
 impl<'a, T> Iterator for ChainIter<'a, T> {
@@ -29,7 +28,6 @@ impl<'a, T> Iterator for ChainIter<'a, T> {
         None
     }
 }
-
 
 impl<T: Default> Chain<T> {
     pub fn new() -> Chain<T> {

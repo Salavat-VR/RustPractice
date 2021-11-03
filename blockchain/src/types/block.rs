@@ -1,5 +1,5 @@
-use blake2::{Blake2s, Digest};
 use blake2::digest::FixedOutput;
+use blake2::{Blake2s, Digest};
 
 use crate::traits::Hashable;
 use crate::types::{Hash, Transaction};
@@ -58,7 +58,6 @@ impl Hashable for Block {
         hex::encode(hasher.finalize_fixed())
     }
 }
-
 
 #[cfg(test)]
 mod tests {

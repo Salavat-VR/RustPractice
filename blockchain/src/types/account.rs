@@ -3,7 +3,7 @@ use crate::types::Balance;
 #[derive(Debug, Clone)]
 pub struct Account {
     account_type: AccountType,
-    balance: Balance,
+    pub(crate) balance: Balance,
 }
 
 #[derive(Debug, Clone)]
@@ -20,4 +20,3 @@ impl Account {
         }
     }
 }
-
