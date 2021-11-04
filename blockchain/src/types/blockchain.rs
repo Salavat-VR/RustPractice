@@ -58,7 +58,7 @@ impl Blockchain {
         let mut block_num = self.blocks.len();
         let mut prev_block_hash: Option<Hash> = None;
 
-        for block in self.block.iter() {
+        for block in self.blocks.iter() {
             let is_genesis = block_num == 1;
 
             if !block.verify() {
@@ -75,7 +75,7 @@ impl Blockchain {
 
             if block_num != self.blocks.len() {
                 if let Some(prev_block_hash) = &prev_block_hash {
-                    if prev_block_hash != &prev_block_hash.clone().unwrap() {
+                    if prev_block_hash != &prev_block_hash.clone() {
                         return Err(format!(
                             "block {} prev_hash doesnt match block {} hash ",
                             block_num + 1,
@@ -120,6 +120,7 @@ impl WorldState for Blockchain {
 #[cfg(test)]
 mod tests {
     use crate::types::TransactionData;
+    use crate::utils::{append_block, append_block_with_tx};
 
     use super::*;
 
@@ -160,16 +161,36 @@ mod tests {
 
         dbg!(block);
     }
-    
-    
-    
+
     #[test]
     fn test_validation_process() {
+        let bc = &mut Blockchain::new();
 
+        let tx_create_account =
+            Transaction::new(TransactionData::CreateAccount("satoshi".to_string()), None);
+        let tx_mint_initial_supply = Transaction::new(
+            TransactionData::MintInitialSupply {
+                to: "satoshi".to_string(),
+                amount: 100_000_000,
+            },
+            None,
+        );
+        assert!(
+            append_block_with_tx(bc, 1, vec![tx_create_account, tx_mint_initial_supply]).is_ok()
+        );
+
+        append_block(bc, 2);
+        append_block(bc, 3);
+
+        let mut iter = bc.blocks.iter_mut();
+        iter.next();
+        iter.next();
+        let block = iter.next().unwrap();
+        block.transactions[1].data = TransactionData::MintInitialSupply {
+            to: "satoshi".to_string(),
+            amount: 100,
+        };
+
+        assert!(bc.validate().is_err());
     }
-    
-    
-    
-    
-    
 }

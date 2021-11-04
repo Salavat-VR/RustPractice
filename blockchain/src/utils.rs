@@ -1,7 +1,7 @@
 use blake2::{Blake2s, Digest};
 use rand::Rng;
 
-use crate::types::AccountId;
+use crate::types::{AccountId, Block, Blockchain, Error, Transaction, TransactionData};
 
 pub fn generate_account_id() -> AccountId {
     let mut rng = rand::thread_rng();
@@ -9,6 +9,33 @@ pub fn generate_account_id() -> AccountId {
     hex::encode(Blake2s::digest(&seed.to_be_bytes()))
 }
 
+pub fn append_block(bc: &mut Blockchain, nonce: u128) -> Block {
+    let mut block = Block::new(bc.get_last_block_hash());
+    let tx_create_account =
+        Transaction::new(TransactionData::CreateAccount(generate_account_id()), None);
+    block.set_nonce(nonce);
+    block.add_transaction(tx_create_account);
+    let block_clone = block.clone();
+
+    assert!(bc.append_block(block).is_ok());
+
+    block_clone
+}
+
+pub fn append_block_with_tx(
+    bc: &mut Blockchain,
+    nonce: u128,
+    transactions: Vec<Transaction>,
+) -> Result<(), Error> {
+    let mut block = Block::new(bc.get_last_block_hash());
+    block.set_nonce(nonce);
+
+    for tx in transactions {
+        block.add_transaction(tx);
+    }
+
+    bc.append_block(block)
+}
 
 #[cfg(test)]
 mod tests {
@@ -16,8 +43,6 @@ mod tests {
 
     #[test]
     fn test_generate() {
-
-        println!("{}",generate_account_id())
-
+        println!("{}", generate_account_id())
     }
 }

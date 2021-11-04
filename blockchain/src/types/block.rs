@@ -5,7 +5,7 @@ use crate::traits::Hashable;
 use crate::types::{Hash, Transaction};
 
 // реализуем дефолтные значения для нашей структуры
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct Block {
     nonce: u128,
     pub(crate) hash: Option<Hash>,
