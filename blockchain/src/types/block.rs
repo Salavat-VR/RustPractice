@@ -9,7 +9,7 @@ use crate::types::{Hash, Transaction};
 pub struct Block {
     nonce: u128,
     pub(crate) hash: Option<Hash>,
-    prev_hash: Option<Hash>,
+    pub(crate) prev_hash: Option<Hash>,
     pub(crate) transactions: Vec<Transaction>,
 }
 
@@ -71,7 +71,7 @@ mod tests {
         let mut block = Block::new(None);
         block.set_nonce(2);
 
-        let mut tx = Transaction::new(TransactionData::CreateAccount("Dmytro".to_string()), None);
+        let tx = Transaction::new(TransactionData::CreateAccount("Dmytro".to_string()), None);
 
         block.add_transaction(tx);
 

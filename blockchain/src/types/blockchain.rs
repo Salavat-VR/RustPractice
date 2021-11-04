@@ -37,7 +37,7 @@ impl Blockchain {
 
         for tx in &block.transactions {
             let result = tx.execute(self, is_genesis);
-            if let Err(error) = result {
+            if let Err(_error) = result {
                 // бэкап транзакций в  случае если случилась какая то ошибка
                 self.accounts = accounts_backup;
 
@@ -52,6 +52,44 @@ impl Blockchain {
 
     pub fn get_last_block_hash(&self) -> Option<Hash> {
         self.blocks.head().map(|block| block.hash())
+    }
+
+    pub fn validate(&self) -> Result<(), Error> {
+        let mut block_num = self.blocks.len();
+        let mut prev_block_hash: Option<Hash> = None;
+
+        for block in self.block.iter() {
+            let is_genesis = block_num == 1;
+
+            if !block.verify() {
+                return Err(format!("block {} has invalid hash", block_num));
+            }
+
+            if !is_genesis && block.prev_hash.is_none() {
+                return Err(format!("block {} doesnt have prev hash", block_num));
+            }
+
+            if is_genesis && block.prev_hash.is_some() {
+                return Err("genesis block shouldn't have prev hash".to_string());
+            }
+
+            if block_num != self.blocks.len() {
+                if let Some(prev_block_hash) = &prev_block_hash {
+                    if prev_block_hash != &prev_block_hash.clone().unwrap() {
+                        return Err(format!(
+                            "block {} prev_hash doesnt match block {} hash ",
+                            block_num + 1,
+                            block_num
+                        ));
+                    }
+                }
+            }
+
+            prev_block_hash = block.prev_hash.clone();
+            block_num -= 1;
+        }
+
+        Ok(())
     }
 }
 
@@ -102,12 +140,12 @@ mod tests {
 
     #[test]
     fn satoshi_test() {
-        let mut bc = Blockchain::new();
+        let _bc = Blockchain::new();
 
-        let mut tx_cr_account =
+        let tx_cr_account =
             Transaction::new(TransactionData::CreateAccount("amI".to_string()), None);
 
-        let mut tx_mint_initial_supply = Transaction::new(
+        let tx_mint_initial_supply = Transaction::new(
             TransactionData::MintInitialSupply {
                 to: "amI".to_string(),
                 amount: 100,
@@ -117,7 +155,21 @@ mod tests {
 
         let mut block = Block::new(None);
         block.set_nonce(2);
+        block.add_transaction(tx_cr_account);
+        block.add_transaction(tx_mint_initial_supply);
 
+        dbg!(block);
+    }
+    
+    
+    
+    #[test]
+    fn test_validation_process() {
 
     }
+    
+    
+    
+    
+    
 }
