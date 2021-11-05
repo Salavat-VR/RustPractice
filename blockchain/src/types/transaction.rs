@@ -68,17 +68,16 @@ impl Transaction {
                     None => Err("you can't send from None address".to_string()),
 
                     Some(sender) => {
-                        let mut sender_balance =
-                            state.get_account_by_id_mut(sender.clone()).unwrap().balance;
-                        if sender_balance - amount < 0 {
+                        let sender = state.get_account_by_id_mut(sender.clone()).unwrap();
+                        if sender.get_balance() - amount < 0 {
                             return Err("insufficient funds".to_string());
                         } else {
+                            sender.set_balance(sender.get_balance() - amount);
                             match state.get_account_by_id_mut(to.clone()) {
                                 None => Err("you are sending to non-existent account. Be careful"
                                     .to_string()),
                                 Some(account) => {
-                                    sender_balance -= amount;
-                                    account.balance += amount;
+                                    account.set_balance(account.balance + amount);
                                     Ok(())
                                 }
                             }
@@ -118,6 +117,8 @@ mod tests {
 
     #[test]
     fn error_sent_from_none_addrs() {
+        // have to throw a panic due to sending from None addrs
+        // works properly
         let bc = &mut Blockchain::new();
 
         let tx_satoshi_account =
@@ -126,11 +127,10 @@ mod tests {
         let tx_other_account =
             Transaction::new(TransactionData::CreateAccount("salavat".to_string()), None);
 
-
         let tx_mint_initial_supply = Transaction::new(
             TransactionData::MintInitialSupply {
                 to: "satoshi".to_string(),
-                amount: 10_000,
+                amount: 100,
             },
             None,
         );
@@ -138,17 +138,9 @@ mod tests {
         let transfer_tx = Transaction::new(
             TransactionData::Transfer {
                 to: "salavat".to_string(),
-                amount: 10_000,
+                amount: 20,
             },
             None,
-        );
-
-        let transfer_tx = Transaction::new(
-            TransactionData::Transfer {
-                to: "salavat".to_string(),
-                amount: 2_000,
-            },
-            Some("satoshi".to_string()),
         );
 
         assert!(append_block_with_tx(
@@ -161,9 +153,164 @@ mod tests {
                 transfer_tx,
             ],
         )
+        .is_err());
+    }
+
+    #[test]
+    fn some_successful_send_in_a_row() {
+        // checking the right transfer function among the Nodes
+        let bc = &mut Blockchain::new();
+
+        let tx_satoshi_account =
+            Transaction::new(TransactionData::CreateAccount("satoshi".to_string()), None);
+
+        let tx_other_account =
+            Transaction::new(TransactionData::CreateAccount("salavat".to_string()), None);
+
+        let tx_mint_initial_supply = Transaction::new(
+            TransactionData::MintInitialSupply {
+                to: "satoshi".to_string(),
+                amount: 100,
+            },
+            None,
+        );
+
+        let transfer_tx_1 = Transaction::new(
+            TransactionData::Transfer {
+                to: "salavat".to_string(),
+                amount: 20,
+            },
+            Some("satoshi".to_string()),
+        );
+
+        let transfer_tx_2 = Transaction::new(
+            TransactionData::Transfer {
+                to: "satoshi".to_string(),
+                amount: 10,
+            },
+            Some("salavat".to_string()),
+        );
+
+        assert!(append_block_with_tx(
+            bc,
+            2,
+            vec![
+                tx_satoshi_account,
+                tx_other_account,
+                tx_mint_initial_supply,
+                transfer_tx_1,
+                transfer_tx_2,
+            ],
+        )
         .is_ok());
 
         dbg!(bc);
+    }
 
+    #[test]
+    fn insufficient_funds() {
+        // Satoshi wants to send 120 BTC meanwhile he has only 100 - can't produce the tx
+        let bc = &mut Blockchain::new();
+
+        let tx_satoshi_account =
+            Transaction::new(TransactionData::CreateAccount("satoshi".to_string()), None);
+
+        let tx_other_account =
+            Transaction::new(TransactionData::CreateAccount("salavat".to_string()), None);
+
+        let tx_mint_initial_supply = Transaction::new(
+            TransactionData::MintInitialSupply {
+                to: "satoshi".to_string(),
+                amount: 100,
+            },
+            None,
+        );
+
+        let transfer_tx = Transaction::new(
+            TransactionData::Transfer {
+                to: "salavat".to_string(),
+                amount: 120,
+            },
+            None,
+        );
+
+        assert_eq!(
+            append_block_with_tx(
+                bc,
+                2,
+                vec![
+                    tx_satoshi_account,
+                    tx_other_account,
+                    tx_mint_initial_supply,
+                    transfer_tx,
+                ],
+            ),
+            Err("tx didn't execute, something went wrong".to_string())
+        );
+    }
+
+    #[test]
+    fn send_from_diff_accounts() {
+        let bc = &mut Blockchain::new();
+
+        let tx_satoshi_account =
+            Transaction::new(TransactionData::CreateAccount("satoshi".to_string()), None);
+
+        let tx_salavat_account =
+            Transaction::new(TransactionData::CreateAccount("salavat".to_string()), None);
+
+        let tx_rustocean_account = Transaction::new(
+            TransactionData::CreateAccount("rustocean".to_string()),
+            None,
+        );
+
+        let tx_mint_initial_supply = Transaction::new(
+            TransactionData::MintInitialSupply {
+                to: "satoshi".to_string(),
+                amount: 100,
+            },
+            None,
+        );
+
+        let transfer_tx_1 = Transaction::new(
+            TransactionData::Transfer {
+                to: "salavat".to_string(),
+                amount: 20,
+            },
+            Some("satoshi".to_string()),
+        );
+
+        let transfer_tx_2 = Transaction::new(
+            TransactionData::Transfer {
+                to: "rustocean".to_string(),
+                amount: 30,
+            },
+            Some("satoshi".to_string()),
+        );
+
+        let transfer_tx_3 = Transaction::new(
+            TransactionData::Transfer {
+                to: "salavat".to_string(),
+                amount: 5,
+            },
+            Some("rustocean".to_string()),
+        );
+
+        assert!(append_block_with_tx(
+            bc,
+            2,
+            vec![
+                tx_satoshi_account,
+                tx_salavat_account,
+                tx_rustocean_account,
+                tx_mint_initial_supply,
+                transfer_tx_1,
+                transfer_tx_2,
+                transfer_tx_3,
+            ],
+        )
+        .is_ok());
+
+        dbg!(bc);
     }
 }
