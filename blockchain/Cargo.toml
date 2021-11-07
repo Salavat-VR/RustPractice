@@ -8,4 +8,6 @@ edition = "2018"
 [dependencies]
 blake2 = "*"
 hex = "*"
-rand= "0.8.0"
+rand = "0.8.0"
+ed25519-dalek = "*"
+ed25519 = "*"

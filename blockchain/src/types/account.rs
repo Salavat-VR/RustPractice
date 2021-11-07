@@ -1,9 +1,14 @@
-use crate::types::Balance;
+use rand::rngs::OsRng;
+
+use crate::types::{Balance, DalekHelloSigner, DalekHelloVerifier};
 
 #[derive(Debug, Clone)]
 pub struct Account {
     account_type: AccountType,
     pub(crate) balance: Balance,
+    // we are verifying by public key and signing by private one
+    pub(crate) public_key: DalekHelloVerifier,
+    pub(crate) private_key: DalekHelloSigner,
 }
 
 #[derive(Debug, Clone)]
@@ -17,6 +22,8 @@ impl Account {
         Account {
             account_type,
             balance: 0,
+            public_key: DalekHelloVerifier,
+            private_key: d25519_dalek::Keypair::generate(&mut OsRng),
         }
     }
 
