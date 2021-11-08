@@ -1,15 +1,8 @@
-use std::ops::Deref;
-
 use blake2::digest::FixedOutput;
 use blake2::{Blake2s, Digest};
 
-use ed25519::signature::{Signer, Verifier};
-use rand_core::{OsRng, RngCore};
-
 use crate::traits::{Hashable, WorldState};
-use crate::types::{
-    AccountId, AccountType, Balance, DalekHelloSigner, DalekHelloVerifier, Error, Hash, Timestamp,
-};
+use crate::types::{AccountId, AccountType, Balance, Error, Hash, Timestamp};
 
 #[derive(Debug, Clone)]
 pub struct Transaction {
@@ -45,20 +38,27 @@ impl Transaction {
             .unwrap()
             .private_key;
 
+        let verify_key = &state
+            .get_account_by_id_mut(self.from.unwrap())
+            .unwrap()
+            .public_key;
+
+        dbg!(signing_key);
+        dbg!(verify_key);
+
+
         // creating a signer
-        let signer = DalekHelloSigner { signing_key };
-
-        // what we are singing the hash of each tx's
-        let transaction_hash = self.hash();
-
-        // creating a signature
-        let signature = signer.sign(transaction_hash.copy());
-
-        let verify_key = signer.signing_key.public;
-        let verifier = DalekHelloVerifier { verify_key };
-
-        assert!(verifier.verify(transaction_hash, &signature).is_ok());
-
+        //let signer = HelloSigner<ed25519_dalek::Keypair> { signing_key };
+        //let verifier = HelloVerifier<ed25519_dalek::PublicKey> { verify_key };
+//
+        //// what we are singing the hash of each tx's
+        //let transaction_hash = self.hash();
+//
+        //// creating a signature
+        //let signature = signer.sign(&transaction_hash);
+//
+        //assert!(verifier.verify(transaction_hash, &signature).is_ok());
+//
         match &self.data {
             TransactionData::CreateAccount(account_id) => {
                 state.create_account(account_id.clone(), AccountType::User)
