@@ -3,21 +3,16 @@ extern crate ed25519_dalek;
 extern crate rand;
 
 
-
-
-use ed25519_dalek::Keypair;
-use rand::rngs::OsRng;
+// use ed25519_dalek::Keypair;
 
 use crate::types::Balance;
 
-
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 pub struct Account {
     account_type: AccountType,
     pub(crate) balance: Balance,
-    // we are verifying by public key and signing by private one
-    pub(crate) private_key: ed25519_dalek::Keypair,
-    pub(crate) public_key: ed25519_dalek::PublicKey,
+    //pub(crate) private_key: ed25519_dalek::SecretKey,
+    //pub(crate) public_key: ed25519_dalek::PublicKey,
 }
 
 #[derive(Debug, Clone)]
@@ -29,16 +24,14 @@ pub enum AccountType {
 impl Account {
     pub fn new(account_type: AccountType) -> Account {
 
-        let mut csprng = OsRng{};
-        // creating each pair of private & public key for account whilst creating it
-        let signing_key = Keypair::generate(&mut csprng);
+        //let key_pair = Keypair::generate(&mut rand::rngs::OsRng{});
 
 
         Account {
             account_type,
             balance: 0,
-            private_key: signing_key.copy(),
-            public_key: signing_key.public,
+            //private_key:  key_pair.secret,
+            //public_key: key_pair.public
         }
     }
 

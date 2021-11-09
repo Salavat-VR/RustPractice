@@ -45,7 +45,10 @@ impl Blockchain {
             }
         }
 
+
         self.blocks.append(block);
+
+
 
         Ok(())
     }
@@ -179,8 +182,8 @@ mod tests {
             append_block_with_tx(bc, 1, vec![tx_create_account, tx_mint_initial_supply]).is_ok()
         );
 
-        append_block(bc, 2);
-        append_block(bc, 3);
+        append_block(bc);
+        append_block(bc);
 
         let mut iter = bc.blocks.iter_mut();
         iter.next();

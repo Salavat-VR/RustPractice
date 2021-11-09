@@ -1,11 +1,10 @@
 use blake2::digest::FixedOutput;
 use blake2::{Blake2s, Digest};
-use ed25519_dalek::{Signature, Signer, Verifier};
 
 use crate::traits::{Hashable, WorldState};
-use crate::types::{AccountId, AccountType, Balance, Error, Hash, Timestamp};
+use crate::types::{AccountId, AccountType, Balance, Error, Hash, TransactionTimestamp};
 
-// Requires the `std` feature of `rand_core`
+
 
 #[derive(Debug, Clone)]
 pub struct Transaction {
@@ -13,7 +12,7 @@ pub struct Transaction {
     pub(crate) from: Option<AccountId>,
     pub(crate) data: TransactionData,
     signature: Option<Hash>,
-    timestamp: Timestamp,
+    timestamp: TransactionTimestamp,
 }
 
 #[derive(Debug, Clone)]
@@ -36,28 +35,25 @@ impl Transaction {
 
     pub fn execute<T: WorldState>(&self, state: &mut T, is_genesis: bool) -> Result<(), Error> {
         // getting the public_key of the receiver
-        let signing_key = &state
-            .get_account_by_id_mut(self.from.unwrap())
-            .unwrap()
-            .private_key;
+        //let signing_key = &state
+        //    .get_account_by_id(self.from.unwrap())
+        //    .unwrap()
+        //    .private_key;
+//
+        //let verify_key = state
+        //    .get_account_by_id_mut(self.from.unwrap())
+        //    .unwrap()
+        //    .public_key;
+//
+//
+        //let signature_bytes = signing_key.sign(transaction_hash.as_bytes()).to_bytes();
 
-        let verify_key = state
-            .get_account_by_id_mut(self.from.unwrap())
-            .unwrap()
-            .public_key;
-
-        // what we are singing the hash of each tx's
-        let transaction_hash = self.hash();
-
-        let signature_bytes = signing_key.sign(transaction_hash.as_bytes()).to_bytes();
-
-        assert!(verify_key
-            .verify(
-                transaction_hash.as_bytes(),
-                &Signature::from(signature_bytes)
-            )
-            .is_ok());
-
+        //assert!(verify_key
+        //    .verify(
+        //        transaction_hash.as_bytes(),
+        //        &Signature::from(signature_bytes)
+        //    )
+        //    .is_ok());
         match &self.data {
             TransactionData::CreateAccount(account_id) => {
                 state.create_account(account_id.clone(), AccountType::User)

@@ -3,6 +3,8 @@ use blake2::{Blake2s, Digest};
 
 use crate::traits::Hashable;
 use crate::types::{Hash, Transaction};
+use chrono::{DateTime, TimeZone, Utc};
+
 
 // реализуем дефолтные значения для нашей структуры
 #[derive(Default, Debug, Clone)]
@@ -11,15 +13,19 @@ pub struct Block {
     pub(crate) hash: Option<Hash>,
     pub(crate) prev_hash: Option<Hash>,
     pub(crate) transactions: Vec<Transaction>,
+    pub(crate) timestamp: DateTime<Utc>,
 }
 
 impl Block {
     pub fn new(prev_hash: Option<Hash>) -> Block {
         let mut block = Block {
+            nonce: 0,
+            hash: None,
             prev_hash,
             // используем эти дефолтные значение для кокретных типов,
             // определенных нами
-            ..Default::default()
+            transactions: vec![],
+            timestamp: chrono::Utc::now(),
         };
 
         block.update_hash();
@@ -31,6 +37,7 @@ impl Block {
         self.nonce = nonce;
         self.update_hash();
     }
+
 
     pub fn add_transaction(&mut self, transaction: Transaction) {
         self.transactions.push(transaction);
