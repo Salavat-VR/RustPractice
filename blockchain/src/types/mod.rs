@@ -5,11 +5,11 @@ pub use blockchain::Blockchain;
 pub use chain::Chain;
 pub use transaction::{Transaction, TransactionData};
 
+
 mod account;
 mod block;
 mod blockchain;
 mod chain;
-mod signature;
 mod transaction;
 
 pub type Hash = String;

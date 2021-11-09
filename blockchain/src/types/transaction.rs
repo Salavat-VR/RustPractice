@@ -1,8 +1,11 @@
 use blake2::digest::FixedOutput;
 use blake2::{Blake2s, Digest};
+use ed25519_dalek::{Signature, Signer, Verifier};
 
 use crate::traits::{Hashable, WorldState};
 use crate::types::{AccountId, AccountType, Balance, Error, Hash, Timestamp};
+
+// Requires the `std` feature of `rand_core`
 
 #[derive(Debug, Clone)]
 pub struct Transaction {
@@ -38,27 +41,23 @@ impl Transaction {
             .unwrap()
             .private_key;
 
-        let verify_key = &state
+        let verify_key = state
             .get_account_by_id_mut(self.from.unwrap())
             .unwrap()
             .public_key;
 
-        dbg!(signing_key);
-        dbg!(verify_key);
+        // what we are singing the hash of each tx's
+        let transaction_hash = self.hash();
 
+        let signature_bytes = signing_key.sign(transaction_hash.as_bytes()).to_bytes();
 
-        // creating a signer
-        //let signer = HelloSigner<ed25519_dalek::Keypair> { signing_key };
-        //let verifier = HelloVerifier<ed25519_dalek::PublicKey> { verify_key };
-//
-        //// what we are singing the hash of each tx's
-        //let transaction_hash = self.hash();
-//
-        //// creating a signature
-        //let signature = signer.sign(&transaction_hash);
-//
-        //assert!(verifier.verify(transaction_hash, &signature).is_ok());
-//
+        assert!(verify_key
+            .verify(
+                transaction_hash.as_bytes(),
+                &Signature::from(signature_bytes)
+            )
+            .is_ok());
+
         match &self.data {
             TransactionData::CreateAccount(account_id) => {
                 state.create_account(account_id.clone(), AccountType::User)
