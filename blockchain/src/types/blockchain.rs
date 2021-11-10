@@ -25,9 +25,9 @@ impl Blockchain {
         self.blocks.len()
     }
     pub fn adjust_target(&mut self, ratio: f32) {
-        let hex_ratio = ratio.to_string().as_bytes().to_hex();
-        let new_target = self.target.as_bytes().to_hex() * hex_ratio;
-        self.target = new_target;
+        // converting the target which is hexadecimal number to u8, then multiplying by ratio
+        // and finally convert back to hexadecimal (String)
+        self.target = format!("{:x}", u32::from_str_radix(&*self.target.to_owned(), 16).unwrap() * ratio as u32);
     }
 
     pub fn append_block(&mut self, block: Block) -> Result<(), Error> {
@@ -53,10 +53,7 @@ impl Blockchain {
             }
         }
 
-
         self.blocks.append(block);
-
-
 
         Ok(())
     }

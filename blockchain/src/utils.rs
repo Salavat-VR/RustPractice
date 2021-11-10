@@ -43,9 +43,6 @@ pub fn append_block(bc: &mut Blockchain) -> Block {
 
     let block_clone = block.clone();
 
-    dbg!(bc.target);
-
-
     assert!(bc.append_block(block).is_ok());
 
     block_clone

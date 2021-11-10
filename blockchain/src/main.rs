@@ -6,13 +6,7 @@ use blockchain::types::{Transaction, TransactionData};
 
 
 fn main() {
-    use hex::ToHex;
-
-    let mut s = String::new();
-    "Hello world!".write_hex(&mut s).unwrap();
-    println!("{}", s);
-}
-/*let keypair_bob = Keypair::generate(&mut rand::rngs::OsRng {});
+    /*let keypair_bob = Keypair::generate(&mut rand::rngs::OsRng {});
     let mut tx = Transaction::new(
         TransactionData::Transfer {
             to: "alice".to_string(),
@@ -44,3 +38,4 @@ fn main() {
     dbg!(pub_key_bob
         .verify(tx.hash().as_bytes(), &Signature::from(signature_bytes))
         .is_ok());*/
+}
