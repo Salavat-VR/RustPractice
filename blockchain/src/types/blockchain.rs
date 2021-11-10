@@ -9,17 +9,25 @@ pub struct Blockchain {
     blocks: Chain<Block>,
     accounts: HashMap<AccountId, Account>,
     transaction_pool: Vec<Transaction>,
+    pub(crate) target: Hash,
 }
 
 impl Blockchain {
     pub fn new() -> Blockchain {
         Blockchain {
+            // first target, which will be adjusting in process
+            target: "0000000000000000000cfecf0000000000000000000000000000000000000000".to_string(),
             ..Default::default()
         }
     }
 
     pub fn len(&self) -> usize {
         self.blocks.len()
+    }
+    pub fn adjust_target(&mut self, ratio: f32) {
+        let hex_ratio = ratio.to_string().as_bytes().to_hex();
+        let new_target = self.target.as_bytes().to_hex() * hex_ratio;
+        self.target = new_target;
     }
 
     pub fn append_block(&mut self, block: Block) -> Result<(), Error> {

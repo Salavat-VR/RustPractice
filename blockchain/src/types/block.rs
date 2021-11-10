@@ -1,9 +1,10 @@
+extern crate time;
+
 use blake2::digest::FixedOutput;
 use blake2::{Blake2s, Digest};
 
 use crate::traits::Hashable;
 use crate::types::{Hash, Transaction};
-use chrono::{DateTime, TimeZone, Utc};
 
 
 // реализуем дефолтные значения для нашей структуры
@@ -13,7 +14,7 @@ pub struct Block {
     pub(crate) hash: Option<Hash>,
     pub(crate) prev_hash: Option<Hash>,
     pub(crate) transactions: Vec<Transaction>,
-    pub(crate) timestamp: DateTime<Utc>,
+    pub(crate) timestamp: i64,
 }
 
 impl Block {
@@ -25,7 +26,8 @@ impl Block {
             // используем эти дефолтные значение для кокретных типов,
             // определенных нами
             transactions: vec![],
-            timestamp: chrono::Utc::now(),
+            // when initializing a block it help us to estimate how it took to match-below-target-thing
+            timestamp: time::now().to_timespec().sec,
         };
 
         block.update_hash();
