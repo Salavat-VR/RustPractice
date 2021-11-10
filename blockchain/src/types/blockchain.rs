@@ -25,7 +25,7 @@ impl Blockchain {
         self.blocks.len()
     }
     pub fn adjust_target(&mut self, ratio: f32) {
-        // converting the target which is hexadecimal number to u8, then multiplying by ratio
+        // converting the target which is hexadecimal number, then multiplying by ratio
         // and finally convert back to hexadecimal (String)
         self.target = format!("{:x}", u32::from_str_radix(&*self.target.to_owned(), 16).unwrap() * ratio as u32);
     }
