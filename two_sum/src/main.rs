@@ -13,7 +13,10 @@ fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
 
     for (i, &num) in nums.iter().enumerate() {
         // if we have the situation matches the demand
-        if let Some(&j) = hm.get(&(target - num)) {
+
+        let search = target - num;
+
+        if let Some(&j) = hm.get(&search) {
             return vec![j, i as i32];
         } else {
             hm.insert(num, i as i32);
