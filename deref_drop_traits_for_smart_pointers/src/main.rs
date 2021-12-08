@@ -7,16 +7,15 @@ fn main() {
     //println!("my str is {}", my_str);
     //assert_eq!(my_str, *ref_my_str);
 
-    let csp = CustomSmartPointer{
-        data: String::from("dmytro")
+    let csp = CustomSmartPointer {
+        data: String::from("dmytro"),
     };
     println!("do some useful stuff and then out of scope");
 }
 
-struct CustomSmartPointer{
-    data: String
+struct CustomSmartPointer {
+    data: String,
 }
-
 
 struct MyBox<T>(T);
 
@@ -39,9 +38,3 @@ impl Drop for CustomSmartPointer {
         println!("{}\t\t value out of scope!", self.data)
     }
 }
-
-
-
-
-
-
