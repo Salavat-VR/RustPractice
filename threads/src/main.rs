@@ -6,7 +6,7 @@ use std::time::Duration;
 fn main() {
     let (tx, rx) = mpsc::channel();
 
-    thread::spawn(move|| {
+    thread::spawn(move || {
         let messages = vec![
             String::from("i"),
             String::from("love"),
